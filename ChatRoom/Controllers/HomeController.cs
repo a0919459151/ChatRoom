@@ -17,6 +17,13 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult ChatRoom(string userName)
+    {
+        ChatRoomViewModel vm = new(userName);
+
+        return View(vm);
+    }
+
     public IActionResult Privacy()
     {
         return View();

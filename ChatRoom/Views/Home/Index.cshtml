@@ -1,47 +1,17 @@
-﻿@{
+﻿@model ChatRoom.Models.HomeIndexViewModel;
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <form method="POST" asp-action="ChatRoom">
+
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" />
+
+        <button type="submit" class="btn btn-primary">Join Chat Room</button>
+    </form>
 </div>
-
-<div>
-    <input type="text" id="userInput" placeholder="Enter name" />
-    <input type="text" id="messageInput" placeholder="Enter message" />
-    <button id="sendButton">Send</button>
-</div>
-
-<ul id="messagesList"></ul>
-
-
-@section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.9/signalr.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            var connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
-
-            connection.on("ReceiveMessage", function (user, message) {
-                var encodedUser = $("<div />").text(user).html();
-                var encodedMsg = $("<div />").text(message).html();
-                var messageContent = encodedUser + " says: " + encodedMsg;
-                $('#messagesList').append($('<li>').html(messageContent));
-            });
-
-            connection.start().catch(function (err) {
-                return console.error(err.toString());
-            });
-
-            $('#sendButton').click(function (event) {
-                var user = $('#userInput').val();
-                var message = $('#messageInput').val();
-                connection.invoke("SendMessage", user, message).catch(function (err) {
-                    return console.error(err.toString());
-                });
-                event.preventDefault();
-            });
-        });
-    </script>
-
-}

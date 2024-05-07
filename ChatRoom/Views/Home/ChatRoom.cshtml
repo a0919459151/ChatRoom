@@ -1,0 +1,88 @@
+﻿@model ChatRoom.Models.ChatRoomViewModel;
+@{
+    ViewData["Title"] = "Chat Room";
+
+    string userName = Model.UserName;
+}
+
+<div>
+    <h5>@userName</h5>
+    <input type="text" id="messageInput" placeholder="Enter message" />
+    <button id="sendButton">Send</button>
+    <button id="leaveRoomButton">Leave</button>
+</div>
+
+<ul id="messagesList"></ul>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.9/signalr.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            // Create hub
+            var hubConnection = new signalR.HubConnectionBuilder().withUrl("/chatRoomHub").build();
+
+            // Connect hub
+            hubConnection.start().then(function () {
+                hubConnection.invoke("JoinRoom", "@userName");
+                console.log("Connected to chatRoomhub");
+            })
+
+            // On JoinRoom
+            hubConnection.on("JoinRoom", function (message) {
+                $('#messagesList').append($('<li>').html(message));
+            });
+
+            // On LeaveRoom
+            hubConnection.on("LeaveRoom", function (message) {
+                $('#messagesList').append($('<li>').html(message));
+            });
+
+            // On ReceiveMessage
+            hubConnection.on("ReceiveMessage", function (user, message) {
+                var encodedUser = $("<div />").text(user).html();
+                var encodedMsg = $("<div />").text(message).html();
+                var messageContent = encodedUser + " : " + encodedMsg;
+                $('#messagesList').append($('<li>').html(messageContent));
+            });
+
+            // On ReceiveMessageToCaller
+            hubConnection.on("ReceiveMessageToCaller", function (message) {
+                var encodedMsg = $("<div />").text(message).html();
+                var messageContent = "Me : " + encodedMsg;
+                $('#messagesList').append($('<li>').html(messageContent));
+            });
+
+            // LeaveRoom
+            // Ridrtect to Home/Index
+            $('#leaveRoomButton').click(function (event) {
+                hubConnection.invoke("LeaveRoom", "@userName")
+                hubConnection.stop()
+                window.location.href = "/Home/Index";
+                event.preventDefault();
+            });
+           
+            // User send message
+            $('#sendButton').click(function (event) {
+                sendMessage(hubConnection);
+                event.preventDefault();
+            });
+            $('#messageInput').keypress(function (event) {
+                if (event.keyCode === 13) {  // Enter key code
+                    sendMessage(hubConnection);
+                    event.preventDefault();
+                }
+            });
+
+            function sendMessage(hubConnection) {
+                var message = $('#messageInput').val();
+                if (message) {
+                    hubConnection.invoke("SendMessage","@userName", message).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                    $('#messageInput').val('');
+                }
+            }
+        });
+    </script>
+}

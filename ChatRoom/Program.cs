@@ -6,6 +6,13 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddSignalR();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set the timeout for session
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -25,6 +32,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapHub<ChatHub>("/chathub");
+app.MapHub<ChatRoomHub>("/chatRoomHub");
 
 app.Run();
