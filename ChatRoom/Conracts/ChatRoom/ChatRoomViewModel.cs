@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChatRoom.Conracts.ChatRoom;
+namespace ChatRoom.Contracts.ChatRoom;
 
 public class ChatRoomViewModel
 {

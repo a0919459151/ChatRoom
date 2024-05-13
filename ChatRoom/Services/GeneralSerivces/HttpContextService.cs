@@ -22,7 +22,7 @@ public class HttpContextService
 
         List<Claim> claims = [
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.NickName),
+            new Claim(ClaimTypes.Name, user.NickName ?? user.Account),
         ];
 
         var claimsIdentity = new ClaimsIdentity(

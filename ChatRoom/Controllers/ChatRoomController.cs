@@ -1,4 +1,4 @@
-﻿using ChatRoom.Conracts.ChatRoom;
+﻿using ChatRoom.Contracts.ChatRoom;
 using ChatRoom.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

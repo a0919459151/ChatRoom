@@ -1,4 +1,4 @@
-namespace ChatRoom.Conracts.Home;
+namespace ChatRoom.Contracts.Home;
 
 public class ErrorViewModel
 {

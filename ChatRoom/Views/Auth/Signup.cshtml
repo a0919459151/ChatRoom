@@ -1,4 +1,4 @@
-﻿@model ChatRoom.Contracts.Auth.LoginViewModel;
+﻿@model ChatRoom.Contracts.Auth.SignupViewModel;
 
 @{
     Layout = null;
@@ -34,7 +34,7 @@
                     <form asp-action="Login" asp-controller="Auth">
 
                         <!-- Title -->
-                        <h1 class="my-5">Log In</h1>
+                        <h1 class="my-5">Sign Up</h1>
 
                         <!-- Account -->
                         <div class="form-outline mb-4">
@@ -50,17 +50,8 @@
 
                         <!-- Submit button -->
                         <div class="col-auto">
-                            <button type="button" class="btn btn-primary btn-block mb-4 w-100">Sign in</button>
+                            <button type="button" class="btn btn-primary btn-block mb-4 w-100">Sign up</button>
                         </div>
-
-                        <!-- Register buttons -->
-                        <div class="text-center">
-                            <p>
-                                Not a member?  
-                                <a asp-controller="Auth" asp-action="Signup">Register</a>
-                            </p>
-                        </div>
-
                     </form>
                 </div>
             </div>

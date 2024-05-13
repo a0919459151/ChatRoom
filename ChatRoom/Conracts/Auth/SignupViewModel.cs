@@ -2,7 +2,7 @@
 
 namespace ChatRoom.Contracts.Auth;
 
-public class LoginViewModel
+public class SignupViewModel
 {
     [Display(Name = "Account")]
     [Required]

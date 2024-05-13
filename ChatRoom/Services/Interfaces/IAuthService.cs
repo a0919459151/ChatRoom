@@ -1,9 +1,12 @@
-﻿using ChatRoom.Conracts.Auth;
+﻿using ChatRoom.Contracts.Auth;
 
 namespace ChatRoom.Services.Interfaces;
 
 public interface IAuthService
 {
-    Task<bool> Login(LoginViewModel model);
+    Task Signup(SignupViewModel model);
+
+    Task Login(LoginViewModel model);
+
     Task Logout();
 }

@@ -1,7 +1,5 @@
-﻿using ChatRoom.Conracts.Auth;
+﻿using ChatRoom.Contracts.Auth;
 using ChatRoom.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +16,22 @@ public class AuthController : Controller
         _authService = authService;
     }
 
+    // Sign up page
+    public IActionResult Signup()
+    {
+        return View(new SignupViewModel());
+    }
+
+    // Sign up
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Signup(SignupViewModel model)
+    {
+        await _authService.Signup(model);
+
+        return RedirectToAction("Login", "Auth");
+    }
+
     // Login page
     public IActionResult Login()
     {
@@ -29,12 +43,7 @@ public class AuthController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-        var isSuccess = await _authService.Login(model);
-
-        if (!isSuccess)
-        {
-            return View(model);
-        }
+        await _authService.Login(model);
 
         return RedirectToAction("Index", "ChatRoom");
     }
@@ -43,6 +52,7 @@ public class AuthController : Controller
     public async Task<IActionResult> Logout()
     {
         await _authService.Logout();
+
         return RedirectToAction(nameof(Login));
     }
 }

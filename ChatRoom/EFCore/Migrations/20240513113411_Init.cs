@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -15,13 +15,17 @@ namespace ChatRoom.EFCore.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    NickName = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false, comment: "Account")
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Account = table.Column<string>(type: "text", nullable: false, comment: "Account"),
+                    Password = table.Column<string>(type: "text", nullable: false, comment: "Password"),
+                    NickName = table.Column<string>(type: "text", nullable: true, comment: "Nick Name")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
+                },
+                comment: "User");
         }
 
         /// <inheritdoc />

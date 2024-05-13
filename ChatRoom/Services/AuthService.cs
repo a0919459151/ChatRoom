@@ -1,9 +1,8 @@
-﻿using ChatRoom.Conracts.Auth;
+﻿using ChatRoom.Contracts.Auth;
 using ChatRoom.EFCore;
 using ChatRoom.EFCore.DBEntities;
 using ChatRoom.Services.GeneralSerivces;
 using ChatRoom.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatRoom.Services;
@@ -21,41 +20,43 @@ public class AuthService : IAuthService
         _httpContextService = httpContextService;
     }
 
-    public async Task<bool> Login(LoginViewModel model)
+    // Sign up
+    public async Task Signup(SignupViewModel model)
     {
-        // New user
-        User newUser = new()
+        // Create user
+        User user = new()
         {
-            Id = Guid.NewGuid(),
-            NickName = model.NickName!
+            Account = model.Account!,
+            Password = model.Password!
         };
 
-        // Add user to db
-        await _context.Users.AddAsync(newUser);
+        // Add
+        await _context.Users.AddAsync(user);
+
+        // Save
         await _context.SaveChangesAsync();
+    }
+
+    public async Task Login(LoginViewModel model)
+    {
+        // TODO: avoid plain text password
+
+        // Query
+        var user = await _context.Users
+            .Where(u => u.Account == model.Account)
+            .Where(u => u.Password == model.Password)
+            .FirstOrDefaultAsync();
+        
+        // Not found
+        if (user is null)
+            throw new Exception("User not found");
 
         // CookieLogin
-        await _httpContextService.CookieLogin(newUser);
-
-        return true;
+        await _httpContextService.CookieLogin(user);
     }
 
     public async Task Logout()
     {
-        // Get current user id
-        Guid userId = _httpContextService.GetCurrentUserId();
-
-        // Query
-        User user = await _context.Users
-            .Where(u => u.Id == userId)
-            .FirstAsync();
-
-        // Remove
-        _context.Users.Remove(user);
-        
-        // Save
-        await _context.SaveChangesAsync();
-
         // CookieLogout
         await _httpContextService.CookieLogout();
     }
