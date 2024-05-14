@@ -1,0 +1,125 @@
+﻿@inject HttpContextService _httpContextService;
+
+@{
+    ViewData["Title"] = "Chat Room";
+
+    // Get user name from claim
+    var userName = _httpContextService.GetCurrentUserName();
+}
+
+<div class="container py-5" style="max-width: 800px">
+    <!-- Title -->
+    <h2 class="text-center">Chat Room</h2>
+
+    <!-- Messages list -->
+    <div class="chat-container">
+        <ul id="messagesList"></ul>
+    </div>
+
+    <!-- User input -->
+    <div class="input-group">
+        <textarea id="messageInput" class="form-control" rows="3" placeholder="Type your message here..."></textarea>
+        <div class="button-container">
+            <button id="sendButton" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
+            <button id="leaveRoomButton" class="btn btn-danger">Leave Room</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.9/signalr.min.js"></script>
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.3/purify.min.js"></script> *@
+    <script>
+        $(document).ready(function () {
+            let $messagesList = $('#messagesList');
+            let $messageInput = $('#messageInput');
+            let $sendButton = $('#sendButton');
+            let $leaveRoomButton = $('#leaveRoomButton');
+
+            let hubConnection = new signalR.HubConnectionBuilder().withUrl("/chatRoomHub").build();
+
+            // Start connect
+            hubConnection.start()
+                .then(function () {
+                    hubConnection.invoke("JoinRoom", "@userName");
+                    console.log("Connected to chatRoomhub");
+                })
+
+            // Listen server event
+            listenServerEvent();
+
+            // Bind dom event
+            bindDomEvent();
+
+            function listenServerEvent() {
+                hubConnection.on("JoinRoom", function (message) {
+
+                    // message = DOMPurify.sanitize(message);  // Sanitize
+
+                    let messageEle = $('<li class="message system-message">').html(message);
+                    $messagesList.append(messageEle);
+                });
+
+                hubConnection.on("LeaveRoom", function (message) {
+
+                    // message = DOMPurify.sanitize(message);  // Sanitize
+
+                    let messageEle = $('<li class="message system-message">').html(message);
+                    $messagesList.append(messageEle);
+                });
+
+                hubConnection.on("ReceiveMessage", function (userName, message) {
+
+                    // userName = DOMPurify.sanitize(userName);  // Sanitize
+                    // message = DOMPurify.sanitize(message);  // Sanitize
+
+                    let messageContent = '<strong>' + userName + ':</strong> ' + message;
+                    let messageEle = $('<li class="message other-message">').html(messageContent);
+                    $messagesList.append(messageEle);
+                });
+
+                hubConnection.on("ReceiveMessageToCaller", function (message) {
+                    
+                    // message = DOMPurify.sanitize(message);  // Sanitize
+
+                    let messageContent = '<strong>Me:</strong> ' + message;
+                    let messageEle = $('<li class="message my-message">').html(messageContent);
+                    $messagesList.append(messageEle);
+                });
+            }
+
+            function bindDomEvent() {
+                $leaveRoomButton.click(function (event) {
+                    leaveRoom(hubConnection);
+                });
+
+                $sendButton.click(function (event) {
+                    sendMessage(hubConnection);
+                });
+
+                $messageInput.keypress(function (event) {
+                    if (event.keyCode === 13) {
+                        sendMessage(hubConnection);
+                    }
+                });
+            }
+
+            function leaveRoom() {
+                hubConnection.invoke("LeaveRoom", "@userName");
+                hubConnection.stop();
+                window.location.href = "/ChatRoom/Index";
+            }
+
+            function sendMessage() {
+                let message = $messageInput.val();
+                if (message) {
+                    hubConnection.invoke("SendMessage", "@userName", message)
+                        .catch(function (err) {
+                            return console.error(err.toString());
+                        });
+                    $messageInput.val('');
+                }
+            }
+        });
+    </script>
+}

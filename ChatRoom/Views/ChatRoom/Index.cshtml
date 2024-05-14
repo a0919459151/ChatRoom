@@ -1,0 +1,19 @@
+﻿@inject HttpContextService _httpContextService;
+@model ChatRoom.Contracts.ChatRoom.ChatRoomViewModel;
+
+@{
+    ViewData["Title"] = "Home Page";
+
+    // Get user name from claim
+    var userName = _httpContextService.GetCurrentUserName();
+}
+
+<div class="text-center">
+
+    <h1 class="display-4">Welcome</h1>
+
+    <h4>Hi, @userName!</h4>
+    
+    <a asp-action="ChatRoom" class="btn btn-primary">Join Room</a>
+
+</div>
