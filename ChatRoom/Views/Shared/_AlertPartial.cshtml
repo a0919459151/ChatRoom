@@ -1,0 +1,21 @@
+﻿@inject AlertService _alertService;
+
+@{
+    var (isSuccess, message) = _alertService.GetAlert();
+}
+
+<script>
+    $(document).ready(function () {
+
+        if (!"@message") return;
+
+        var isSuccess = @Html.Raw(Json.Serialize(isSuccess));
+        var message = @Html.Raw(Json.Serialize(message));
+
+        if (isSuccess) {
+            alert("Success, " + message);
+        } else {
+            alert("Fail, " + message);
+        }
+    });
+</script>

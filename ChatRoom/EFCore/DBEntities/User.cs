@@ -1,10 +1,23 @@
-﻿namespace ChatRoom.EFCore.DBEntities;
+﻿using Microsoft.EntityFrameworkCore;
 
+namespace ChatRoom.EFCore.DBEntities;
+
+[Comment("User")]
 public class User
 {
     // Id
-    public required Guid Id { get; set; }
+    [Comment("Account")]
+    public int Id { get; set; }
+
+    // Account
+    [Comment("Account")]
+    public required string Account { get; set; }
+
+    // Password
+    [Comment("Password")]
+    public required string Password { get; set; }
 
     // Nick Name
-    public required string NickName { get; set; }
+    [Comment("Nick Name")]
+    public string? NickName { get; set; }
 }

@@ -1,33 +1,58 @@
 ﻿using ChatRoom.Contracts.Auth;
+using ChatRoom.EFCore;
 using ChatRoom.EFCore.DBEntities;
-using ChatRoom.Services.GeneralSerivces;
+using ChatRoom.GeneralSerivces;
 using ChatRoom.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatRoom.Services;
 
 public class AuthService : IAuthService
 {
+    private readonly AppDbContext _context;
     private readonly HttpContextService _httpContextService;
 
     public AuthService(
+        AppDbContext context,
         HttpContextService httpContextService)
     {
+        _context = context;
         _httpContextService = httpContextService;
     }
 
-    public async Task<bool> Login(LoginViewModel model)
+    // Sign up
+    public async Task Signup(SignupViewModel model)
     {
-        // New user
-        User newUser = new()
+        // Create user
+        User user = new()
         {
-            Id = Guid.NewGuid(),
-            NickName = model.NickName!
+            Account = model.Account!,
+            Password = model.Password!
         };
 
-        // CookieLogin
-        await _httpContextService.CookieLogin(newUser);
+        // Add
+        await _context.Users.AddAsync(user);
 
-        return true;
+        // Save
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task Login(LoginViewModel model)
+    {
+        // TODO: avoid plain text password
+
+        // Query
+        var user = await _context.Users
+            .Where(u => u.Account == model.Account)
+            .Where(u => u.Password == model.Password)
+            .FirstOrDefaultAsync();
+        
+        // Not found
+        if (user is null)
+            throw new Exception("User not found");
+
+        // CookieLogin
+        await _httpContextService.CookieLogin(user);
     }
 
     public async Task Logout()

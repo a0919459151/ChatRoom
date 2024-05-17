@@ -20,3 +20,8 @@ html {
 body {
     margin-bottom: 60px;
 }
+
+.a-link {
+    color: rgb(136, 180, 223) !important;
+    text-decoration: none !important;
+}

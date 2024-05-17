@@ -18,7 +18,7 @@ public class ChatRoomController : Controller
     public IActionResult Index()
     {
         ChatRoomViewModel vm = new();
-
+        
         return View(vm);
     }
 
