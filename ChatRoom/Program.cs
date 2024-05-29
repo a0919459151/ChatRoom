@@ -1,7 +1,12 @@
 using ChatRoom.Hubs;
 using DependencyInjection;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog
+builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
+    loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
